@@ -144,34 +144,33 @@
             }
 
             /*== Comprobando Email ==*/
-            // if($email=!""){
-            //     echo json_encode($email);
-            //     if(filter_var($email, FILTER_VALIDATE_EMAIL)){
-            //         $check_email = mainModel::ejecutar_consulta_simple("SELECT usuario_email FROM usuario WHERE usuario_email = '$email';");
-            //         if($check_email->rowCount()>0){
-            //             $alerta = [
-            //                 "Alerta" => "simple",
-            //                 "Titulo" => "¡Ocurrió un error inesperado!",
-            //                 "Texto" => "El email digitado ya existe",
-            //                 "Tipo" => "error"
-            //             ];
-            //             echo json_encode($alerta);
-            //             exit();
-            //         }
-            //     }else{
-            //         $alerta = [
-            //             "Alerta" => "simple",
-            //             "Titulo" => "¡Ocurrió un error inesperado!",
-            //             "Texto" => "El email digitado no es válido",
-            //             "Tipo" => "error"
-            //         ];
-            //         echo json_encode($alerta);
-            //         exit();
-            //     }
-            // }
+            if(!empty($email)){
+                if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+                    $check_email = mainModel::ejecutar_consulta_simple("SELECT usuario_email FROM usuario WHERE usuario_email = '$email';");
+                    if($check_email->rowCount()>0){
+                        $alerta = [
+                            "Alerta" => "simple",
+                            "Titulo" => "¡Ocurrió un error inesperado!",
+                            "Texto" => "El email digitado ya existe",
+                            "Tipo" => "error"
+                        ];
+                        echo json_encode($alerta);
+                        exit();
+                    }
+                }else{
+                    $alerta = [
+                        "Alerta" => "simple",
+                        "Titulo" => "¡Ocurrió un error inesperado!",
+                        "Texto" => "El email digitado no es válido",
+                        "Tipo" => "error"
+                    ];
+                    echo json_encode($alerta);
+                    exit();
+                }
+            }
 
             /*== Comprobando Contraseñas ==*/
-            if($clave1=!$clave2){
+            if($clave1!=$clave2){
                 $alerta = [
                     "Alerta" => "simple",
                     "Titulo" => "¡Ocurrió un error inesperado!",
@@ -181,8 +180,53 @@
                 echo json_encode($alerta);
                 exit();
             }else{
-
+                $pass = mainModel::encryption($clave1);
             }
+
+            /*== Comprobando Privilegio ==*/
+            if($privilegio < 1 || $privilegio > 3){
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "El privilegio seleccionado no es válido",
+                    "Tipo" => "error"
+                ];
+                echo json_encode($alerta);
+                exit();
+            }
+
+            $datos_usuario_reg = [
+                "DNI" => $dni,
+                "Nombre" => $nombre,
+                "Apellido" => $apellido,
+                "Telefono" => $telefono,
+                "Direccion" => $direccion,
+                "Email" => $email,
+                "Usuario" => $usuario,
+                "Clave" => $pass,
+                "Estado" => "Activa",
+                "Privilegio" => $privilegio
+            ];
+
+            $agregar_usuario = usuarioModelo::agregar_usuario_modelo($datos_usuario_reg);
+
+            if($agregar_usuario->rowCount()==1){
+                $alerta = [
+                    "Alerta" => "limpiar",
+                    "Titulo" => "!Usuario registrado!",
+                    "Texto" => "Los datos del usuario han sido registrado con éxito",
+                    "Tipo" => "success"
+                ];
+            }else{
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "No se ha podido realizar el registro del usuario",
+                    "Tipo" => "error"
+                ];
+            }
+
+            echo json_encode($alerta);
 
         } //Fin controlador para agregar usuario
 
