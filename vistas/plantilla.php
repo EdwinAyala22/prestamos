@@ -19,9 +19,15 @@
         $vistas = $Iv->obtener_vistas_controlador();
 
         if($vistas == "login" || $vistas == "404"){
+
             require_once "./vistas/contenidos/".$vistas."-view.php";
+
         }else{
+
             session_start(['name'=>'SPM']);
+
+            $pagina = explode('/', $_GET['views']);
+
             require_once "./controladores/loginControlador.php";
             $lc = new loginControlador();
             
@@ -48,6 +54,8 @@
                 </section>
             </main>
     <?php
+
+            include "./vistas/inc/LogOut.php";
 
         }
 

@@ -1,6 +1,6 @@
 <?php
 
- if($_POST['privilegio_spm'] != 1){
+ if($_SESSION['privilegio_spm'] != 1){
 	echo $lc->forzar_cierre_sesion_controlador();
 	exit();
  }

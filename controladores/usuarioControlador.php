@@ -230,4 +230,129 @@
 
         } //Fin controlador para agregar usuario
 
+        /*----- Controlador para paginar usuarios -----*/
+        public function paginador_usuario_controlador($pagina,$num_registros,$privilegio,$id,$url,$busqueda){
+
+            $pagina = mainModel::limpiar_cadena($pagina);
+            $num_registros = mainModel::limpiar_cadena($num_registros);
+            $privilegio = mainModel::limpiar_cadena($privilegio);
+            $id = mainModel::limpiar_cadena($id);
+
+            $url = mainModel::limpiar_cadena($url);
+            $url = SERVER_URL.$url."/";
+
+            $busqueda = mainModel::limpiar_cadena($busqueda);
+            $tabla = "";
+
+            $pagina = (isset($pagina) && $pagina > 0 ) ? (int) $pagina : 1 ;
+            $inicio = ($pagina > 0 ) ? (($pagina*$num_registros) - $num_registros ) : 0 ;
+
+            if(isset($busqueda) && $busqueda != "" ){
+                $consulta = "SELECT SQL_CALC_FOUND_ROWS * FROM usuario WHERE ((usuario_id != $id AND usuario_id != 1) 
+                            AND (usuario_dni LIKE '%$busqueda%' OR usuario_nombre LIKE '%$busqueda'% 
+                            OR usuario_apellido LIKE '%$busqueda%' OR usuario_telefono LIKE '%$busqueda%'
+                            OR usuario_email LIKE '%$busqueda%' OR usuario_usuario LIKE '%$busqueda%')) 
+                            ORDER BY usuario_nombre ASC LIMIT $inicio,$num_registros;";
+            }else{
+                $consulta = "SELECT SQL_CALC_FOUND_ROWS * FROM usuario WHERE 
+                            usuario_id != $id AND usuario_id !=1 ORDER BY 
+                            usuario_nombre ASC LIMIT $inicio,$num_registros";
+            }
+
+            $conexion = mainModel::conectar();
+
+            $datos = $conexion->query($consulta);
+            $datos = $datos->fetchAll();
+            
+            $total = $conexion->query("SELECT FOUND_ROWS()");
+            $total = (int) $total->fetchColumn();
+
+            $num_paginas = ceil($total/$num_registros);
+
+            $tabla .= '
+            <div class="table-responsive">
+                <table class="table table-dark table-sm">
+                    <thead>
+                        <tr class="text-center roboto-medium">
+                            <th>#</th>
+                            <th>DNI</th>
+                            <th>NOMBRE</th>
+                            <th>TELÉFONO</th>
+                            <th>USUARIO</th>
+                            <th>EMAIL</th>
+                            <th>ACTUALIZAR</th>
+                            <th>ELIMINAR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            ';
+
+            if($total >= 1 && $pagina <= $num_paginas){
+
+                $contador = $inicio + 1;
+                
+                foreach($datos as $rows){
+
+                    $telefono_v = ($rows['usuario_telefono'] == '' ) ? 'N/A' : $rows['usuario_telefono'] ;
+
+                    $tabla .= '
+                    <tr class="text-center">
+                        <td>'.$contador.'</td>
+                        <td>'.$rows['usuario_dni'].'</td>
+                        <td>'.$rows['usuario_nombre'].' '.$rows['usuario_apellido'].'</td>
+                        <td>'.$telefono_v.'</td>
+                        <td>'.$rows['usuario_usuario'].'</td>
+                        <td>'.$rows['usuario_email'].'</td>
+                        <td>
+                            <a href="<?php echo SERVER_URL; ?>user-update/" class="btn btn-success">
+                                <i class="fas fa-sync-alt"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <form action="">
+                                <button type="button" class="btn btn-warning">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+				    </tr>
+                    ';
+                    $contador++;
+                }
+
+            }else{
+                
+                if($total >= 1){
+                    $tabla .= '
+                        <tr class="text-center">
+                            <td colspan = "9" >
+                                <a href = "'.$url.'" class = "btn btn-raised btn-primary btn-sm">
+                                    Haga click aquí para recargar el listado
+                                </a>
+                            </td>
+                        </tr>
+                    ';
+                }else{
+                    $tabla .= '
+                        <tr class="text-center">
+                            <td colspan = "9" > No hay registros. </td>
+                        </tr>
+                    ';
+                }
+
+            }
+
+            $tabla .= '
+                    </tbody>
+                </table>
+            </div>
+            ';
+
+            if($total >= 1 && $pagina <= $num_paginas){
+                $tabla .= mainModel::paginador_tablas($pagina,$num_paginas,$url,7);
+            }
+            return $tabla;
+
+        }//Fin controlador para paginar usuario
+
     }

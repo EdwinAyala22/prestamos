@@ -1,6 +1,6 @@
 <?php
 
- if($_POST['privilegio_spm'] != 1){
+ if($_SESSION['privilegio_spm'] != 1){
 	echo $lc->forzar_cierre_sesion_controlador();
 	exit();
  }
@@ -35,110 +35,24 @@
 
 <!-- Content -->
 <div class="container-fluid">
-	<div class="table-responsive">
-		<table class="table table-dark table-sm">
-			<thead>
-				<tr class="text-center roboto-medium">
-					<th>#</th>
-					<th>DNI</th>
-					<th>NOMBRE</th>
-					<th>APELLIDO</th>
-					<th>TELÉFONO</th>
-					<th>USUARIO</th>
-					<th>EMAIL</th>
-					<th>ACTUALIZAR</th>
-					<th>ELIMINAR</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="text-center">
-					<td>1</td>
-					<td>03045643</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>APELLIDO DE USUARIO</td>
-					<td>2345456</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>ADMIN@ADMIN.COM</td>
-					<td>
-						<a href="<?php echo SERVER_URL; ?>user-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-				<tr class="text-center">
-					<td>2</td>
-					<td>03045643</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>APELLIDO DE USUARIO</td>
-					<td>2345456</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>ADMIN@ADMIN.COM</td>
-					<td>
-						<a href="<?php echo SERVER_URL; ?>user-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-				<tr class="text-center">
-					<td>3</td>
-					<td>03045643</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>APELLIDO DE USUARIO</td>
-					<td>2345456</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>ADMIN@ADMIN.COM</td>
-					<td>
-						<a href="<?php echo SERVER_URL; ?>user-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-				<tr class="text-center">
-					<td>4</td>
-					<td>03045643</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>APELLIDO DE USUARIO</td>
-					<td>2345456</td>
-					<td>NOMBRE DE USUARIO</td>
-					<td>ADMIN@ADMIN.COM</td>
-					<td>
-						<a href="<?php echo SERVER_URL; ?>user-update/" class="btn btn-success">
-							<i class="fas fa-sync-alt"></i>
-						</a>
-					</td>
-					<td>
-						<form action="">
-							<button type="button" class="btn btn-warning">
-								<i class="far fa-trash-alt"></i>
-							</button>
-						</form>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<nav aria-label="Page navigation example">
+<?php
+	require_once "./controladores/usuarioControlador.php";
+ 	$ins_usuario = new usuarioControlador();
+
+	echo $ins_usuario->paginador_usuario_controlador(
+		$pagina[1],
+		10,
+		$_SESSION['privilegio_spm'],
+		$_SESSION['id_spm'],
+		$pagina[0],""
+	);
+
+?>
+
+	
+			
+
+	<!-- <nav aria-label="Page navigation example">
 		<ul class="pagination justify-content-center">
 			<li class="page-item disabled">
 				<a class="page-link" href="#" tabindex="-1">Previous</a>
@@ -150,5 +64,5 @@
 				<a class="page-link" href="#">Next</a>
 			</li>
 		</ul>
-	</nav>
+	</nav> -->
 </div>
