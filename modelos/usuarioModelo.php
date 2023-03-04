@@ -25,7 +25,16 @@
             $sql->execute();
 
             return $sql;
+        }
 
+        /*----- Modelo para eliminar usuario -----*/
+        protected static function eliminar_usuario_modelo($id){
+            $sql = mainModel::conectar()->prepare("DELETE FROM usuario WHERE usuario_id = :ID;");
+
+            $sql->bindParam("ID",$id);
+            $sql->execute();
+
+            return $sql;
         }
 
     }

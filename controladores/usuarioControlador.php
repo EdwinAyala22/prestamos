@@ -290,10 +290,11 @@
             if($total >= 1 && $pagina <= $num_paginas){
 
                 $contador = $inicio + 1;
-                
+                $reg_inicio = $inicio + 1;
                 foreach($datos as $rows){
 
                     $telefono_v = ($rows['usuario_telefono'] == '' ) ? 'N/A' : $rows['usuario_telefono'] ;
+                    $correo_v = ($rows['usuario_email'] == '' ) ? 'N/A' : $rows['usuario_email'] ;
 
                     $tabla .= '
                     <tr class="text-center">
@@ -302,15 +303,16 @@
                         <td>'.$rows['usuario_nombre'].' '.$rows['usuario_apellido'].'</td>
                         <td>'.$telefono_v.'</td>
                         <td>'.$rows['usuario_usuario'].'</td>
-                        <td>'.$rows['usuario_email'].'</td>
+                        <td>'.$correo_v.'</td>
                         <td>
-                            <a href="<?php echo SERVER_URL; ?>user-update/" class="btn btn-success">
+                            <a href="'.SERVER_URL.'user-update/'.mainModel::encryption($rows['usuario_id']).'/" class="btn btn-success">
                                 <i class="fas fa-sync-alt"></i>
                             </a>
                         </td>
                         <td>
-                            <form action="">
-                                <button type="button" class="btn btn-warning">
+                            <form class="FormularioAjax" action="'.SERVER_URL.'ajax/usuarioAjax.php" method="POST" data-form="delete" autocomplete="off">
+                                <input type="hidden" name="usuario_id_del" value="'.mainModel::encryption($rows['usuario_id']).'">
+                                <button type="submit" class="btn btn-warning">
                                     <i class="far fa-trash-alt"></i>
                                 </button>
                             </form>
@@ -319,6 +321,8 @@
                     ';
                     $contador++;
                 }
+
+                $reg_final = $contador - 1;
 
             }else{
                 
@@ -349,10 +353,95 @@
             ';
 
             if($total >= 1 && $pagina <= $num_paginas){
+                $tabla .= '
+                <p class="text-right"> Mostrando usuario '.$reg_inicio.' al '.$reg_final.' de un total de '.$total.' </p>
+                ';
+
                 $tabla .= mainModel::paginador_tablas($pagina,$num_paginas,$url,7);
             }
             return $tabla;
 
         }//Fin controlador para paginar usuario
 
+        /*----- Controlador para agregar usuario -----*/
+        public function eliminar_usuario_controlador(){
+            /* Recibiendo id del usuario  */
+            $id = mainModel::decryption($_POST['usuario_id_del']);
+            $id = mainModel::limpiar_cadena($id);
+
+            /* Comprobando el usuario */
+            if($id == 1){
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "Este usuario no se puede eliminar",
+                    "Tipo" => "error"
+                ];
+                echo json_encode($alerta);
+                exit();
+            }
+
+            /* Comprobando el usuario  en BD*/
+            $check_usuario_id = mainModel::ejecutar_consulta_simple("SELECT usuario_id FROM 
+                                usuario WHERE usuario_id = $id;");
+            if($check_usuario_id->rowCount() <= 0){
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "El usuario a eliminar no existe",
+                    "Tipo" => "error"
+                ];
+                echo json_encode($alerta);
+                exit();
+            }
+
+            /* Comprobando prestamos*/
+            $check_prestamos_id = mainModel::ejecutar_consulta_simple("SELECT usuario_id FROM 
+                                prestamo WHERE usuario_id = $id LIMIT 1;");
+            if($check_prestamos_id->rowCount() > 0){
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "No se puede eliminar este usuraio, porque tiene prestamos asociados. 
+                    Recomendamos deshabilitar el usuario si ya no será utilizado",
+                    "Tipo" => "error"
+                ];
+                echo json_encode($alerta);
+                exit();
+            }
+
+            /* Comprobando privilegios*/
+            session_start(['name'=>'SPM']);
+            if($_SESSION['privilegio_spm'] != 1 ){
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "No tienes permiso para eliminar usuarios",
+                    "Tipo" => "error"
+                ];
+                echo json_encode($alerta);
+                exit();
+            }
+
+            $eliminar_usuario = usuarioModelo::eliminar_usuario_modelo($id);
+
+            if($eliminar_usuario->rowCount() == 1){
+                $alerta = [
+                    "Alerta" => "recargar",
+                    "Titulo" => "¡Usuario eliminado!",
+                    "Texto" => "El usuario ha sido eliminado completamente",
+                    "Tipo" => "success"
+                ];
+            }else{
+                $alerta = [
+                    "Alerta" => "simple",
+                    "Titulo" => "¡Ocurrió un error inesperado!",
+                    "Texto" => "No se logró eliminar el usuario, intente nuevamente",
+                    "Tipo" => "error"
+                ];
+            }
+
+            echo json_encode($alerta);
+
+        }//Fin controlador para elimianr usuario
     }
