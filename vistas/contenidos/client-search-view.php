@@ -30,7 +30,7 @@
                 <div class="col-12 col-md-6">
                     <div class="form-group">
                         <label for="inputSearch" class="bmd-label-floating">¿Qué cliente estas buscando?</label>
-                        <input type="text" class="form-control" name="busqueda-" id="inputSearch" maxlength="30">
+                        <input type="text" class="form-control" name="busqueda_inicial" id="inputSearch" maxlength="30">
                     </div>
                 </div>
                 <div class="col-12">
@@ -45,7 +45,7 @@
 
 <div class="container-fluid">
     <form action="">
-        <input type="hidden" name="eliminar-busqueda" value="eliminar">
+        <input type="hidden" name="eliminar_busqueda" value="eliminar">
         <div class="container-fluid">
             <div class="row justify-content-md-center">
                 <div class="col-12 col-md-6">

@@ -19,7 +19,7 @@
             echo $ins_usuario->eliminar_usuario_controlador();
         }
 
-        /*----- actualziar usuario -----*/
+        /*----- actualizar usuario -----*/
         if(isset($_POST['usuario_id_up'])){
             echo $ins_usuario->actualizar_usuario_controlador();
         }

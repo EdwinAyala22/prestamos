@@ -28,6 +28,9 @@
 
             $pagina = explode('/', $_GET['views']);
 
+            // echo ' <script> console.log("'.$_SESSION['nombre_spm'].'") </script> ';
+            // echo ' <script> console.log("'.$_SESSION['id_spm'].'") </script> ';
+
             require_once "./controladores/loginControlador.php";
             $lc = new loginControlador();
             
