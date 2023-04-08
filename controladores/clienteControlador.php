@@ -174,6 +174,7 @@
                             <th>#</th>
                             <th>DNI</th>
                             <th>NOMBRE</th>
+                            <th>APELLIDO</th>
                             <th>TELÉFONO</th>
                             <th>DIRECCIÓN</th>';
                             if($privilegio==1 || $privilegio==2){
@@ -197,22 +198,41 @@
                     <tr class="text-center">
                         <td>'.$contador.'</td>
                         <td>'.$rows['cliente_dni'].'</td>
-                        <td>'.$rows['cliente_nombre'].' '.$rows['cliente_apellido'].'</td>
+                        <td>'.$rows['cliente_nombre'].'</td>
+                        <td>'.$rows['cliente_apellido'].'</td>
                         <td>'.$rows['cliente_telefono'].'</td>
-                        <td>'.$rows['cliente_direccion'].'</td>
-                        <td>
-                            <a href="'.SERVER_URL.'user-update/'.mainModel::encryption($rows['cliente_id']).'/" class="btn btn-success">
-                                <i class="fas fa-sync-alt"></i>
-                            </a>
-                        </td>
-                        <td>
-                            <form class="FormularioAjax" action="'.SERVER_URL.'ajax/clienteAjax.php" method="POST" data-form="delete" autocomplete="off">
-                                <input type="hidden" name="cliente_id_del" value="'.mainModel::encryption($rows['cliente_id']).'">
-                                <button type="submit" class="btn btn-warning">
-                                    <i class="far fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        </td>
+                        <td> 
+                            <button type="button" class="btn btn-info" data-toggle="popover" data-trigger="hover" 
+                                    title="'.$rows['cliente_nombre'].' '.$rows['cliente_apellido'].'" 
+                                    data-content="'.$rows['cliente_direccion'].'">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
+                        </td>';
+                    if($privilegio==1 || $privilegio==2){
+                        $tabla .= '
+                            <td>
+                                <a href="'.SERVER_URL.'client-update/'.mainModel::encryption($rows['cliente_id']).'/" class="btn btn-success">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                            </td>
+                        ';
+                    }
+
+                    if($privilegio==1){
+                        $tabla .= '
+                            <td>
+                                <form class="FormularioAjax" action="'.SERVER_URL.'ajax/clienteAjax.php" method="POST" data-form="delete" autocomplete="off">
+                                    <input type="hidden" name="cliente_id_del" value="'.mainModel::encryption($rows['cliente_id']).'">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        ';
+                    }
+                        
+                        
+                    $tabla .= '    
                     </tr>
                     ';
                     $contador++;
